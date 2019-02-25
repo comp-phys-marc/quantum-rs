@@ -64,4 +64,17 @@ fn test_create_ensemble() {
     subsystems.insert(first_symbol, first_state);
     subsystems.insert(second_symbol, second_state);
     let ensemble = super::ensemble::create_ensemble(subsystems);
+
+    let subsystem_p = match ensemble.subsystems.get(&first_symbol) {
+        Some(subsystem_p) => subsystem_p,
+        None => panic!("could not retriveve subsystem from ensemble")
+    };
+
+    let subsystem_q = match ensemble.subsystems.get(&second_symbol) {
+        Some(subsystem_q) => subsystem_q,
+        None => panic!("could not retriveve subsystem from ensemble")
+    };
+
+    assert_eq!(subsystem_p.symbol, first_symbol);
+    assert_eq!(subsystem_q.symbol, second_symbol);
 }

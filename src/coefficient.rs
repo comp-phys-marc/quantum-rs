@@ -120,12 +120,12 @@ impl Coefficient {
     }
 
     pub fn print(&self) {
-        let sign:char = if self.magnitude < 0.0 { '-' } else { '+' };
-        print!("{}", sign);
-        if self.magnitude < 0.0 {
-            print!("i");
-        }
-        println!("{:.3}", self.magnitude);
+        // no-print let sign:char = if self.magnitude < 0.0 { '-' } else { '+' };
+        // no-print print!("{}", sign);
+        // no-print if self.imaginary {
+            // no-print print!(" i");
+        // no-print }
+        // no-print print!(" {:.3} ", self.magnitude);
     }
 }
 
@@ -234,9 +234,9 @@ impl ComplexCoefficient {
     }
 
     pub fn print(&self) {
-        print!(" + (");
-        self.real_component.print();
-        self.imaginary_component.print();
-        print!(" )");
+        // no-print print!(" + (");
+        // no-print self.real_component.print();
+        // no-print self.imaginary_component.print();
+        // no-print print!(" )");
     }
 }

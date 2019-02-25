@@ -4,6 +4,7 @@ use crate::ket::Ket;
 use crate::coefficient;
 use crate::coefficient::ComplexCoefficient;
 
+#[derive(Clone)]
 pub struct State {
     pub kets: Vec<Ket>,
     pub num_qubits: usize,
@@ -11,9 +12,6 @@ pub struct State {
 }
 
 pub fn create_state(kets:Vec<Ket>, num_qubits:usize, symbol:char) -> State {
-    if kets.len() != num_qubits {
-        panic!("setting state with incorrect number of qubits was attempted");
-    }
     State{kets: kets, num_qubits: num_qubits, symbol: symbol}
 }
 
@@ -47,58 +45,59 @@ impl State {
 
     pub fn x(&mut self, qubit:usize) {
         for ket in &mut self.kets {
-            print!("x ({})", qubit);
-            ket.print();
-            print!(" =");
+            // no-print print!("x ({})", qubit);
+            // no-print ket.print();
+            // no-print print!(" =");
             ket.x(qubit);
-            ket.print();
-            println!();
+            // no-print ket.print();
+            // no-print println!();
         }
     }
          
     pub fn cx(&mut self, source:usize, target:usize) {
         for ket in &mut self.kets {
-            print!("cx ({} -> {})",source, target);
-            ket.print();
-            print!(" =");
+            // no-print print!("cx ({} -> {})",source, target);
+            // no-print ket.print();
+            // no-print print!(" =");
             ket.cx(source, target);
-            ket.print();
-            println!();
+            // no-print ket.print();
+            // no-print println!();
         }
     }
        
     pub fn y(&mut self, qubit:usize) {
         for ket in &mut self.kets {
-            print!("y ({})", qubit);
-            ket.print();
-            print!(" =");
+            // no-print print!("y ({})", qubit);
+            // no-print ket.print();
+            // no-print print!(" =");
             ket.y(qubit);
-            ket.print();
-            print!("\n");
+            // no-print ket.print();
+            // no-print println!();
         }
     }
             
     pub fn z(&mut self, qubit:usize) {
         for ket in &mut self.kets {
-            print!("z ({})", qubit);
-            ket.print();
-            print!(" =");
+            // no-print print!("z ({})", qubit);
+            // no-print ket.print();
+            // no-print print!(" =");
             ket.z(qubit);
-            ket.print();
-            print!("\n");
+            // no-print ket.print();
+            // no-print println!();
         }
     }
             
     pub fn h(&mut self, qubit:usize) {
         let empty_coefficient = coefficient::create_coefficient(0.0, false);
-        let mut beta = coefficient::create_complex_coefficient(empty_coefficient, empty_coefficient);
-        let mut alpha = coefficient::create_complex_coefficient(empty_coefficient, empty_coefficient);
+        let empty_imaginary_coefficient = coefficient::create_coefficient(0.0, true);
+        let mut beta = coefficient::create_complex_coefficient(empty_coefficient, empty_imaginary_coefficient);
+        let mut alpha = coefficient::create_complex_coefficient(empty_coefficient, empty_imaginary_coefficient);
         let mut one_kets:Vec<Ket> = vec![];
         let mut zero_kets:Vec<Ket> = vec![];
 
         for ket in &self.kets {
             match ket.get_val().get(qubit) {
-                Some(true) => { 
+                Some(true) => {
                     one_kets.push(ket.clone());
                     beta = beta.add_to_complex_coefficient(ket.get_coefficient()); 
                 },
@@ -108,49 +107,50 @@ impl State {
                 }
             };
         }
+
         let mut negative_beta = beta.clone();
         negative_beta.negate_magnitude();
 
         if alpha.equals_complex_coefficient(beta) {
-            print!("h ({})", qubit);
-            for ket in &self.kets {
-                ket.print();
-            }
-            print!(" =");
+            // no-print print!("h ({})", qubit);
+            // no-print for ket in &self.kets {
+                // no-print ket.print();
+            // no-print }
+            // no-print print!(" =");
             self.kets = zero_kets;
-            for ket in &self.kets {
-                ket.print();
-            }
-            println!();
+            // no-print for ket in &self.kets {
+                // no-print ket.print();
+            // no-print }
+            // no-print println!();
         }
 
         else if alpha.equals_complex_coefficient(negative_beta) {
-            print!("h ({})", qubit);
-            for ket in &self.kets {
-                ket.print();
-            }
-            print!(" =");
+            // no-print print!("h ({})", qubit);
+            // no-print for ket in &self.kets {
+                // no-print ket.print();
+            // no-print }
+            // no-print print!(" =");
             self.kets = one_kets;
-            for ket in &self.kets {
-                ket.print();
-            }
-            println!();
+            // no-print for ket in &self.kets {
+                // no-print ket.print();
+            // no-print }
+            // no-print println!();
         }
 
         else {
             let mut new_kets:Vec<Ket> = vec![];
             for ket in &mut self.kets {
-                print!("h ({})", qubit);
-                ket.print();
+                // no-print print!("h ({})", qubit);
+                // no-print ket.print();
                 let hadamard_result = ket.h(qubit);
                 for result in &hadamard_result {
                     new_kets.push(result.clone());
                 }
-                print!(" =");
-                for result in &hadamard_result {
-                    result.print();
-                }
-                print!("\n");
+                // no-print print!(" =");
+                // no-print for result in &hadamard_result {
+                    // no-print result.print();
+                // no-print }
+                // no-print println!();
             }
             self.kets = new_kets;
         }
@@ -158,8 +158,9 @@ impl State {
     
     pub fn m(&mut self, qubit:usize) -> bool {
         let empty_coefficient = coefficient::create_coefficient(0.0, false);
-        let mut beta = coefficient::create_complex_coefficient(empty_coefficient, empty_coefficient);
-        let mut alpha = coefficient::create_complex_coefficient(empty_coefficient, empty_coefficient);
+        let empty_imaginary_coefficient = coefficient::create_coefficient(0.0, true);
+        let mut beta = coefficient::create_complex_coefficient(empty_coefficient, empty_imaginary_coefficient);
+        let mut alpha = coefficient::create_complex_coefficient(empty_coefficient, empty_imaginary_coefficient);
 
         let mut one_kets:Vec<Ket> = vec![];
         let mut zero_kets:Vec<Ket> = vec![];
@@ -229,26 +230,26 @@ impl State {
     }
         
     pub fn print(&self) {
-        print!("|{}> =", self.symbol);
-        for ket in &self.kets {
-            ket.print();
-        }
-        println!();
+        // no-print print!("|{}> =", self.symbol);
+        // no-print for ket in &self.kets {
+            // no-print ket.print();
+        // no-print }
+        // no-print println!();
     }
 
     pub fn print_state_vectors(&self) {
         let mut qubit = 0;
 
         while qubit < self.num_qubits {
-            println!("qubit {} state vector:", qubit);
+            // no-print println!("qubit {} state vector:", qubit);
             let vector = self.get_components(qubit);
-            print!("alpha: ");
+            // no-print print!("alpha: ");
 
-            for comp in &vector {
-                comp.print();
-                println!();
-            }
-            println!();
+            // no-print for comp in &vector {
+                // no-print comp.print();
+                // no-print println!();
+            // no-print }
+            // no-print println!();
 
             qubit += 1;
         }

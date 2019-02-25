@@ -1,5 +1,7 @@
 use std::collections::BTreeMap;
+use std::mem::replace;
 use crate::state::State;
+use crate::ket::Ket;
 use crate::ket;
 
 pub struct Ensemble {
@@ -18,20 +20,30 @@ impl Ensemble {
 
     pub fn m(&mut self, target_system:char, target_qubit:usize) -> bool {
 
-        let outcome = match self.subsystems.get(&target_system) {
-            Some(system) => system.m(target_qubit),
+        let system = match self.subsystems.get(&target_system) {
+            Some(system) => system,
             None => panic!("attempt to measure non-existent system")
         };
+
+        let outcome = system.clone().m(target_qubit);
+
+        let mut to_remove:Vec<Ket> = vec![];
         
         for (name, subsystem) in &mut self.subsystems {
-            for entangled_ket in &subsystem.kets {
+            to_remove = vec![];
+            for entangled_ket in &mut subsystem.kets {
                 if entangled_ket.is_entangled() && entangled_ket.is_entangled_with(target_system, target_qubit) {
                     let collapse = entangled_ket.should_collapse(outcome, target_system, target_qubit);
                     if collapse {
-                        subsystem.remove_ket(*entangled_ket);
+                        to_remove.push(entangled_ket.clone());
                     }
                 }
             }
+            let mut new_subsystem = subsystem.clone();
+            for ket in to_remove {
+                new_subsystem.remove_ket(ket);
+            }
+            replace(subsystem, new_subsystem);
         }
         outcome
     }
@@ -43,24 +55,30 @@ impl Ensemble {
             None => panic!("attempt to control from non-existent system")
         };
 
+        let mut new_source = source.clone();
+
         let mut target = match self.subsystems.get(&target_system) {
-            Some(target) => *target,
+            Some(target) => target,
             None => panic!("attempt to control to non-existent system")
         };
 
+        let mut new_target = target.clone();
+
         if source_system == target_system {
-            source.cx(source_qubit, target_qubit);
+            new_source.cx(source_qubit, target_qubit);
         }
         else {
             let [alpha_source, beta_source] = source.get_components(source_qubit);
 
-            print!("q: ");
-            source.print();
+            // no-print print!("q: ");
+            // no-print source.print();
 
-            for ket in &mut target.kets {
-                print!("cx ({}[{}] -> {}[{}])", source_system, source_qubit, target_system, target_qubit);
-                ket.print();
-                print!(" =");
+            let mut new_kets:Vec<Ket>  = vec![];
+
+            for ket in &mut new_target.kets {
+                // no-print print!("cx ({}[{}] -> {}[{}])", source_system, source_qubit, target_system, target_qubit);
+                // no-print ket.print();
+                // no-print print!(" =");
 
                 let new_coeff = ket.get_coefficient();
                 let new_val = ket.get_val();
@@ -71,14 +89,19 @@ impl Ensemble {
                 ket.set_coefficient(ket.get_coefficient().multiply_by_complex_coefficient(beta_source));
 
                 new_ket.entangle(false, source_system, source_qubit);
-                target.add_ket(new_ket);
+                new_kets.push(new_ket.clone());
 
                 ket.entangle(true, source_system, source_qubit);
-                ket.print();
-                println!();
-
-                target.print();
+                // no-print ket.print();
+                // no-print println!();
             }
+
+            for ket in new_kets {
+                new_target.add_ket(ket);
+                // no-print new_target.print();
+            }
+            replace(&mut target, &new_target);
+            replace(&mut source, &new_source);
         }
     }
 }

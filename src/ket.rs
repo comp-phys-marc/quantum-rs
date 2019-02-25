@@ -1,6 +1,9 @@
+use std::mem::replace;
 extern crate bit_vec;
-use crate::coefficient::ComplexCoefficient;
 use bit_vec::BitVec;
+use crate::coefficient::ComplexCoefficient;
+
+
 
 #[derive(Clone)]
 pub struct Ket {
@@ -11,10 +14,6 @@ pub struct Ket {
 
 pub fn create_ket(coeff:ComplexCoefficient, val:BitVec, entanglements:Vec<Entanglement>) -> Ket {
     Ket{coefficient: coeff, val: val, entanglements: entanglements}
-}
-
-fn toggle(data: &mut bool) {
-    *data != *data;
 }
 
 impl Ket {
@@ -48,7 +47,14 @@ impl Ket {
         while q < self.val.len() {
             if q == qubit {
                 match self.val.get(q) {
-                    Some(mut val) => toggle(&mut val),
+                    Some(mut val) => { 
+                        if val == true {
+                            self.val.set(q, false);
+                        }
+                        else {
+                            self.val.set(q, true);
+                        }
+                     },
                     None => panic!("attempt to flip non-existent qubit.")
                 };
                 break;
@@ -76,8 +82,8 @@ impl Ket {
     }
         
     pub fn print(&self) {
-        self.coefficient.print();
-        print!("|{:?}>", self.val);
+        // no-print self.coefficient.print();
+        // no-print print!("|{:?}>", self.val);
     }
 
     pub fn is_entangled(&self) -> bool {
