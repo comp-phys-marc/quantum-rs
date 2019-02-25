@@ -15,7 +15,7 @@ fn create_eleven_bit_ket() -> ket::Ket {
     ket
 }
 
-fn counterfeit_coin_finding() {
+fn counterfeit_coin_finding() -> BitVec {
 
     let num_qubits = 11;
     let symbol = 'q';
@@ -70,14 +70,22 @@ fn counterfeit_coin_finding() {
     if result == false { state.h(7); }
     if result == false { state.h(8); }
     if result == false { state.h(9); }
+
+    let mut q = 0;
+    while q < 11 {
+        creg.set(q, state.m(q));
+        q += 1;
+    }
+    creg
 }
 
 
 fn main() {
     let start = Instant::now();
-    counterfeit_coin_finding();
-
+    let output = counterfeit_coin_finding();
     let elapsed = start.elapsed();
     println!("Elapsed: {} ms",
              (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
+
+    println!("{:?}", output);
 }
