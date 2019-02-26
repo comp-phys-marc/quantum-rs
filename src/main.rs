@@ -15,7 +15,7 @@ fn create_eleven_bit_ket() -> ket::Ket {
     ket
 }
 
-fn counterfeit_coin_finding() -> BitVec {
+fn eleven_qubit_counterfeit_coin_finding() -> BitVec {
 
     let num_qubits = 11;
     let symbol = 'q';
@@ -82,10 +82,8 @@ fn counterfeit_coin_finding() -> BitVec {
 
 fn main() {
     let start = Instant::now();
-    let output = counterfeit_coin_finding();
+    let output = eleven_qubit_counterfeit_coin_finding();
     let elapsed = start.elapsed();
-    println!("Elapsed: {} ms",
+    println!("Elapsed time for 11 qubits: {} ms",
              (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
-
-    println!("{:?}", output);
 }
