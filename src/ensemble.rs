@@ -1,3 +1,5 @@
+//! A data structure that represents a set of quantum systems and facilitates communication between them.
+
 use std::collections::BTreeMap;
 use std::mem::replace;
 use crate::state::State;
@@ -8,18 +10,20 @@ pub struct Ensemble {
     pub subsystems: BTreeMap<char, State>
 }
 
+/// Initializes an ensemble of quantum systems.
 pub fn create_ensemble(subsystems:BTreeMap<char, State>) -> Ensemble {
     Ensemble{subsystems: subsystems}
 }
 
 impl Ensemble {
 
+    /// Adds a subsystem to the ensemble.
     pub fn add_subsystem(&mut self, state:State, name:char) {
         self.subsystems.insert(name, state);
     }
 
+    /// Measures a qubit and collapses quantum state across subsystems accordingly.
     pub fn m(&mut self, target_system:char, target_qubit:usize) -> bool {
-
         let system = match self.subsystems.get(&target_system) {
             Some(system) => system,
             None => panic!("attempt to measure non-existent system")
@@ -48,8 +52,8 @@ impl Ensemble {
         outcome
     }
 
+    /// Applies a Controlled X gate within or between subsystems.
     pub fn cx(&mut self, source_system:char, source_qubit:usize, target_system:char, target_qubit:usize) {
-
         let mut source = match self.subsystems.get(&source_system) {
             Some(source) => source,
             None => panic!("attempt to control from non-existent system")

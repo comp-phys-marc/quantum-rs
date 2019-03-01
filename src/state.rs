@@ -1,3 +1,6 @@
+//! # State
+//! A data structure that represents a full quantum state and maintains a set of underlying kets.
+
 extern crate rand;
 use rand::Rng;
 use crate::ket::Ket;
@@ -11,23 +14,27 @@ pub struct State {
     pub symbol: char
 }
 
+/// Initializes a quantum state with a given set of kets and number of qubits.
 pub fn create_state(kets:Vec<Ket>, num_qubits:usize, symbol:char) -> State {
     State{kets: kets, num_qubits: num_qubits, symbol: symbol}
 }
 
 impl State {
-        
+
+    /// Adds a ket to the overall quantum state.        
     pub fn add_ket(&mut self, ket:Ket) {
         self.kets.push(ket);
     }
-        
+
+    /// Removes a ket from the overall quantum state.        
     pub fn remove_ket(&mut self, ket:Ket) {
         match self.kets.iter().position(|k| k.equals(ket.clone())) {
             Some(index) => { self.kets.remove(index); },
             _ => panic!("attempt to remove non-existent ket")
         }
     }
-    
+
+    /// Determines the components of the state vector for the given target qubit.    
     pub fn get_components(&self, qubit:usize) -> [ComplexCoefficient; 2] {
         let empty_coefficient = coefficient::create_coefficient(0.0, false);
         let mut beta = coefficient::create_complex_coefficient(empty_coefficient, empty_coefficient);
@@ -43,6 +50,7 @@ impl State {
         [alpha, beta]
     }
 
+    /// Performs a Pauli X gate on the target qubit.
     pub fn x(&mut self, qubit:usize) {
         for ket in &mut self.kets {
             // no-print print!("x ({})", qubit);
@@ -54,6 +62,8 @@ impl State {
         }
     }
          
+    /// Performs a Controlled X gate on the target qubit with the 
+    /// source qubit as controller.
     pub fn cx(&mut self, source:usize, target:usize) {
         for ket in &mut self.kets {
             // no-print print!("cx ({} -> {})",source, target);
@@ -64,7 +74,8 @@ impl State {
             // no-print println!();
         }
     }
-       
+
+    /// Performs a Pauli Y gate on the target qubit.       
     pub fn y(&mut self, qubit:usize) {
         for ket in &mut self.kets {
             // no-print print!("y ({})", qubit);
@@ -75,7 +86,8 @@ impl State {
             // no-print println!();
         }
     }
-            
+
+    /// Performs a Pauli Z gate on the target qubit.            
     pub fn z(&mut self, qubit:usize) {
         for ket in &mut self.kets {
             // no-print print!("z ({})", qubit);
@@ -86,7 +98,8 @@ impl State {
             // no-print println!();
         }
     }
-            
+
+    /// Performs a Hadamard gate on the target qubit.            
     pub fn h(&mut self, qubit:usize) {
         let empty_coefficient = coefficient::create_coefficient(0.0, false);
         let empty_imaginary_coefficient = coefficient::create_coefficient(0.0, true);
@@ -155,7 +168,8 @@ impl State {
             self.kets = new_kets;
         }
     }
-    
+
+    /// Measures the target qubit.    
     pub fn m(&mut self, qubit:usize) -> bool {
         let empty_coefficient = coefficient::create_coefficient(0.0, false);
         let empty_imaginary_coefficient = coefficient::create_coefficient(0.0, true);
@@ -186,7 +200,8 @@ impl State {
         }
         result
     }
-    
+
+    /// Normalizes the current quantum state.    
     pub fn normalize(&mut self) {
         let mut total_probability = 0.0;
         let mut unique_kets:Vec<Ket> = vec![];
@@ -213,10 +228,12 @@ impl State {
             }
         }
         self.kets = unique_kets;
-        println!("normalizing factor: {}", norm_factor);
+        // no-print println!("normalizing factor: {}", norm_factor);
     }
 
 
+    /// Used pseudo-random number generation to simulate the probabilistic outcome of a qubit 
+    /// measurement. Update the quantum system with the measurement results.
     pub fn _measure(&self, alpha:f64, beta:f64) -> bool {
         let cutoff = alpha*100.0;
         let mut rng = rand::thread_rng();
@@ -228,7 +245,8 @@ impl State {
             true
         }
     }
-        
+
+    /// Prints the full quantum state.        
     pub fn print(&self) {
         // no-print print!("|{}> =", self.symbol);
         // no-print for ket in &self.kets {
@@ -237,6 +255,7 @@ impl State {
         // no-print println!();
     }
 
+    /// Prints the state vector for each qubit.
     pub fn print_state_vectors(&self) {
         let mut qubit = 0;
 
