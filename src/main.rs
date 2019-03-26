@@ -225,4 +225,12 @@ fn main() {
     elapsed = start.elapsed();
     println!("Elapsed time for 11 qubits: {} ms",
              (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
+
+    start = Instant::now();
+    output = twelve_qubit_counterfeit_coin_finding();
+    elapsed = start.elapsed();
+    println!("Elapsed time for 12 qubits: {} ms",
+             (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64);
+
+    
 }
