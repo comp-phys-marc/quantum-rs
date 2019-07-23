@@ -1,8 +1,12 @@
 extern crate bit_vec;
+extern crate qasm;
+
 use bit_vec::BitVec;
 use std::collections::BTreeMap;
+
 use crate::ket::Ket;
 use crate::state::State;
+use crate::parser::execute_qasm;
 
 fn create_ket() -> Ket {
     let imaginary_coeff = super::coefficient::create_coefficient(1.0, true);
@@ -67,14 +71,74 @@ fn test_create_ensemble() {
 
     let subsystem_p = match ensemble.subsystems.get(&first_symbol) {
         Some(subsystem_p) => subsystem_p,
-        None => panic!("could not retriveve subsystem from ensemble")
+        None => panic!("could not retrieve subsystem from ensemble")
     };
 
     let subsystem_q = match ensemble.subsystems.get(&second_symbol) {
         Some(subsystem_q) => subsystem_q,
-        None => panic!("could not retriveve subsystem from ensemble")
+        None => panic!("could not retrieve subsystem from ensemble")
     };
 
     assert_eq!(subsystem_p.symbol, first_symbol);
     assert_eq!(subsystem_q.symbol, second_symbol);
+}
+
+#[test]
+fn test_lexer() {
+    let source = r#"
+    OPENQASM 2.0;
+    qreg a[3];
+    CX a[0], a[1];
+    "#;
+
+    let tokens = qasm::lex(source);
+    assert_eq!(
+        vec![
+            qasm::Token::OpenQASM,
+            qasm::Token::Real(2.0),
+            qasm::Token::Semicolon,
+            qasm::Token::QReg,
+            qasm::Token::Id("a".to_string()),
+            qasm::Token::LSParen,
+            qasm::Token::NNInteger(3),
+            qasm::Token::RSParen,
+            qasm::Token::Semicolon,
+            qasm::Token::Id("CX".to_string()),
+            qasm::Token::Id("a".to_string()),
+            qasm::Token::LSParen,
+            qasm::Token::NNInteger(0),
+            qasm::Token::RSParen,
+            qasm::Token::Comma,
+            qasm::Token::Id("a".to_string()),
+            qasm::Token::LSParen,
+            qasm::Token::NNInteger(1),
+            qasm::Token::RSParen,
+            qasm::Token::Semicolon
+        ],
+        tokens
+    )
+}
+
+#[test]
+fn test_parser() {
+    let source = r#"
+    OPENQASM 2.0;
+    qreg q[3];
+    qreg r[3];
+    x q[0];
+    cx q[0], q[1];
+    creg c[3];
+    measure q[0]->c[0];
+    measure r[0]->c[1];
+    measure q[0]->c[2];
+    "#;
+
+    let result = execute_qasm(source);
+    let mut expect = BTreeMap::new();
+    let mut regs = BTreeMap::new();
+    regs.insert(0, 1);
+    regs.insert(1, 0);
+    regs.insert(2, 1);
+    expect.insert('c', regs);
+    assert_eq!(result, expect);
 }

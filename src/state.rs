@@ -37,8 +37,9 @@ impl State {
     /// Determines the components of the state vector for the given target qubit.    
     pub fn get_components(&self, qubit:usize) -> [ComplexCoefficient; 2] {
         let empty_coefficient = coefficient::create_coefficient(0.0, false);
-        let mut beta = coefficient::create_complex_coefficient(empty_coefficient, empty_coefficient);
-        let mut alpha = coefficient::create_complex_coefficient(empty_coefficient, empty_coefficient);
+        let empty_imaginary_coefficient = coefficient::create_coefficient(0.0, true);
+        let mut beta = coefficient::create_complex_coefficient(empty_coefficient, empty_imaginary_coefficient);
+        let mut alpha = coefficient::create_complex_coefficient(empty_coefficient, empty_imaginary_coefficient);
         for ket in &self.kets {
             if Some(true) == ket.get_val().get(qubit) {
                 beta = beta.add_to_complex_coefficient(ket.get_coefficient());
@@ -53,12 +54,12 @@ impl State {
     /// Performs a Pauli X gate on the target qubit.
     pub fn x(&mut self, qubit:usize) {
         for ket in &mut self.kets {
-            // no-print print!("x ({})", qubit);
-            // no-print ket.print();
-            // no-print print!(" =");
+            print!("x ({})", qubit);
+            ket.print();
+            print!(" =");
             ket.x(qubit);
-            // no-print ket.print();
-            // no-print println!();
+            ket.print();
+            println!();
         }
     }
          
@@ -66,40 +67,40 @@ impl State {
     /// source qubit as controller.
     pub fn cx(&mut self, source:usize, target:usize) {
         for ket in &mut self.kets {
-            // no-print print!("cx ({} -> {})",source, target);
-            // no-print ket.print();
-            // no-print print!(" =");
+            print!("cx ({} -> {})",source, target);
+            ket.print();
+            print!(" =");
             ket.cx(source, target);
-            // no-print ket.print();
-            // no-print println!();
+            ket.print();
+            println!();
         }
     }
 
     /// Performs a Pauli Y gate on the target qubit.       
     pub fn y(&mut self, qubit:usize) {
         for ket in &mut self.kets {
-            // no-print print!("y ({})", qubit);
-            // no-print ket.print();
-            // no-print print!(" =");
+            print!("y ({})", qubit);
+            ket.print();
+            print!(" =");
             ket.y(qubit);
-            // no-print ket.print();
-            // no-print println!();
+            ket.print();
+            println!();
         }
     }
 
     /// Performs a Pauli Z gate on the target qubit.            
     pub fn z(&mut self, qubit:usize) {
         for ket in &mut self.kets {
-            // no-print print!("z ({})", qubit);
-            // no-print ket.print();
-            // no-print print!(" =");
+            print!("z ({})", qubit);
+            ket.print();
+            print!(" =");
             ket.z(qubit);
-            // no-print ket.print();
-            // no-print println!();
+            ket.print();
+            println!();
         }
     }
 
-    /// Performs a Hadamard gate on the target qubit.            
+    /// Performs a Hadamard gate on the target qubit.
     pub fn h(&mut self, qubit:usize) {
         let empty_coefficient = coefficient::create_coefficient(0.0, false);
         let empty_imaginary_coefficient = coefficient::create_coefficient(0.0, true);
@@ -125,45 +126,45 @@ impl State {
         negative_beta.negate_magnitude();
 
         if alpha.equals_complex_coefficient(beta) {
-            // no-print print!("h ({})", qubit);
-            // no-print for ket in &self.kets {
-                // no-print ket.print();
-            // no-print }
-            // no-print print!(" =");
+            print!("h ({})", qubit);
+            for ket in &self.kets {
+                ket.print();
+            }
+            print!(" =");
             self.kets = zero_kets;
-            // no-print for ket in &self.kets {
-                // no-print ket.print();
-            // no-print }
-            // no-print println!();
+            for ket in &self.kets {
+                ket.print();
+            }
+            println!();
         }
 
         else if alpha.equals_complex_coefficient(negative_beta) {
-            // no-print print!("h ({})", qubit);
-            // no-print for ket in &self.kets {
-                // no-print ket.print();
-            // no-print }
-            // no-print print!(" =");
+            print!("h ({})", qubit);
+            for ket in &self.kets {
+                ket.print();
+            }
+            print!(" =");
             self.kets = one_kets;
-            // no-print for ket in &self.kets {
-                // no-print ket.print();
-            // no-print }
-            // no-print println!();
+            for ket in &self.kets {
+                ket.print();
+            }
+            println!();
         }
 
         else {
             let mut new_kets:Vec<Ket> = vec![];
             for ket in &mut self.kets {
-                // no-print print!("h ({})", qubit);
-                // no-print ket.print();
+                print!("h ({})", qubit);
+                ket.print();
                 let hadamard_result = ket.h(qubit);
                 for result in &hadamard_result {
                     new_kets.push(result.clone());
                 }
-                // no-print print!(" =");
-                // no-print for result in &hadamard_result {
-                    // no-print result.print();
-                // no-print }
-                // no-print println!();
+                print!(" =");
+                for result in &hadamard_result {
+                    result.print();
+                }
+                println!();
             }
             self.kets = new_kets;
         }
@@ -228,7 +229,7 @@ impl State {
             }
         }
         self.kets = unique_kets;
-        // no-print println!("normalizing factor: {}", norm_factor);
+        println!("normalizing factor: {}", norm_factor);
     }
 
 
@@ -248,11 +249,11 @@ impl State {
 
     /// Prints the full quantum state.        
     pub fn print(&self) {
-        // no-print print!("|{}> =", self.symbol);
-        // no-print for ket in &self.kets {
-            // no-print ket.print();
-        // no-print }
-        // no-print println!();
+        print!("|{}> =", self.symbol);
+        for ket in &self.kets {
+            ket.print();
+        }
+        println!();
     }
 
     /// Prints the state vector for each qubit.
@@ -260,15 +261,15 @@ impl State {
         let mut qubit = 0;
 
         while qubit < self.num_qubits {
-            // no-print println!("qubit {} state vector:", qubit);
+            println!("qubit {} state vector:", qubit);
             let vector = self.get_components(qubit);
-            // no-print print!("alpha: ");
+            print!("alpha: ");
 
-            // no-print for comp in &vector {
-                // no-print comp.print();
-                // no-print println!();
-            // no-print }
-            // no-print println!();
+            for comp in &vector {
+                comp.print();
+                println!();
+            }
+            println!();
 
             qubit += 1;
         }

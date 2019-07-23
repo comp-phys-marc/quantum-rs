@@ -74,15 +74,15 @@ impl Ensemble {
         else {
             let [alpha_source, beta_source] = source.get_components(source_qubit);
 
-            // no-print print!("q: ");
-            // no-print source.print();
+            print!("q: ");
+            source.print();
 
             let mut new_kets:Vec<Ket>  = vec![];
 
             for ket in &mut new_target.kets {
-                // no-print print!("cx ({}[{}] -> {}[{}])", source_system, source_qubit, target_system, target_qubit);
-                // no-print ket.print();
-                // no-print print!(" =");
+                print!("cx ({}[{}] -> {}[{}])", source_system, source_qubit, target_system, target_qubit);
+                ket.print();
+                print!(" =");
 
                 let new_coeff = ket.get_coefficient();
                 let new_val = ket.get_val();
@@ -96,13 +96,13 @@ impl Ensemble {
                 new_kets.push(new_ket.clone());
 
                 ket.entangle(true, source_system, source_qubit);
-                // no-print ket.print();
-                // no-print println!();
+                ket.print();
+                println!();
             }
 
             for ket in new_kets {
                 new_target.add_ket(ket);
-                // no-print new_target.print();
+                new_target.print();
             }
             replace(&mut target, &new_target);
             replace(&mut source, &new_source);

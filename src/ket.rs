@@ -2,7 +2,6 @@
 //! Data structures that represent the information associated with a single ket in a quantum state,
 //! including any relationship to entanglement and non-linear effects.
 
-use std::mem::replace;
 extern crate bit_vec;
 use bit_vec::BitVec;
 use crate::coefficient::ComplexCoefficient;
@@ -98,8 +97,8 @@ impl Ket {
 
     /// Prints the state.        
     pub fn print(&self) {
-        // no-print self.coefficient.print();
-        // no-print print!("|{:?}>", self.val);
+        self.coefficient.print();
+        print!("|{:?}>", self.val);
     }
 
     /// Determines whether the existence of the ket is predicated upon entanglement 

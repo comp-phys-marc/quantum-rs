@@ -30,11 +30,13 @@ impl Coefficient {
 
     /// Multiplies the coefficient by another which is purely real or purely imaginary.
     pub fn multiply_by_coefficient(&self, other: Coefficient) -> Coefficient {
-        let new_imaginary:bool = false;
         let new_magnitude:f64 = self.magnitude*other.get_magnitude();
-        let mut new_coeff = create_coefficient(new_magnitude, new_imaginary);
-        if self.imaginary == true {
+        let mut new_coeff= create_coefficient(new_magnitude, false);
+        if self.imaginary == true && other.imaginary == true {
             new_coeff.negate_magnitude();
+        }
+        else if self.imaginary == true || other.imaginary == true {
+            new_coeff.set_imaginary();
         }
         new_coeff
     }
@@ -130,20 +132,21 @@ impl Coefficient {
     }
 
     /// Takes the complex conjugate of the coefficient in place.
-    pub fn complex_conjugate(&mut self) {
+    pub fn complex_conjugate(&mut self) -> Coefficient {
         if self.imaginary == true {
             self.negate_magnitude();
         }
+        *self
     }
 
     /// Prints the coefficient.
     pub fn print(&self) {
-        // no-print let sign:char = if self.magnitude < 0.0 { '-' } else { '+' };
-        // no-print print!("{}", sign);
-        // no-print if self.imaginary {
-            // no-print print!(" i");
-        // no-print }
-        // no-print print!(" {:.3} ", self.magnitude);
+        let sign:char = if self.magnitude < 0.0 { '-' } else { '+' };
+        print!("{}", sign);
+        if self.imaginary {
+            print!(" i");
+        }
+        print!(" {:.3} ", self.magnitude);
     }
 }
 
@@ -179,7 +182,7 @@ impl ComplexCoefficient {
     /// Multiplies the coefficient by another which has both real and imaginary components.
     pub fn multiply_by_complex_coefficient(&self, other: ComplexCoefficient) -> ComplexCoefficient {
         let new_imaginary_component = other.get_real_component().multiply_by_coefficient(self.imaginary_component).add_to_coefficient(other.get_imaginary_component().multiply_by_coefficient(self.real_component));
-        let new_real_component = other.get_real_component().multiply_by_coefficient(self.real_component).add_to_coefficient(other.get_imaginary_component().multiply_by_coefficient(self.imaginary_component));
+        let new_real_component = other.get_real_component().multiply_by_coefficient(self.real_component).add_to_coefficient(other.get_imaginary_component().multiply_by_coefficient(self.imaginary_component).complex_conjugate());
         create_complex_coefficient(new_real_component, new_imaginary_component)
     }
 
@@ -269,9 +272,9 @@ impl ComplexCoefficient {
 
     /// Prints the complex coefficient.
     pub fn print(&self) {
-        // no-print print!(" + (");
-        // no-print self.real_component.print();
-        // no-print self.imaginary_component.print();
-        // no-print print!(" )");
+        print!(" + (");
+        self.real_component.print();
+        self.imaginary_component.print();
+        print!(" )");
     }
 }
