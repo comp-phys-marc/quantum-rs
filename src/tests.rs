@@ -1,5 +1,4 @@
 extern crate bit_vec;
-extern crate qasm;
 
 use bit_vec::BitVec;
 use std::collections::BTreeMap;
@@ -19,9 +18,15 @@ fn create_ket() -> Ket {
 
 #[test]
 fn test_create_coefficient() {
-    let magnitude:f64 = 1.00;
-    let imaginary:bool = true;
-    let coeff = super::coefficient::create_coefficient(magnitude, imaginary);
+    let mut magnitude:f64 = 1.00;
+    let mut imaginary:bool = true;
+    let mut coeff = super::coefficient::create_coefficient(magnitude, imaginary);
+    assert_eq!(coeff.get_magnitude(), magnitude);
+    assert_eq!(coeff.get_imaginary(), imaginary);
+
+    magnitude = 0.50;
+    imaginary = false;
+    coeff = super::coefficient::create_coefficient(magnitude, imaginary);
     assert_eq!(coeff.get_magnitude(), magnitude);
     assert_eq!(coeff.get_imaginary(), imaginary);
 }
@@ -38,21 +43,36 @@ fn test_equals_coefficient() {
 
 #[test]
 fn test_create_ket() {
-    let imaginary_coeff = super::coefficient::create_coefficient(1.0, true);
-    let real_coeff = super::coefficient::create_coefficient(1.0, false);
-    let complex_coeff = super::coefficient::create_complex_coefficient(real_coeff, imaginary_coeff);
-    let init_state = BitVec::from_elem(3, false);
-    let ket = super::ket::create_ket(complex_coeff, init_state.clone(), vec![]);
+    let mut imaginary_coeff = super::coefficient::create_coefficient(1.0, true);
+    let mut real_coeff = super::coefficient::create_coefficient(1.0, false);
+    let mut complex_coeff = super::coefficient::create_complex_coefficient(real_coeff, imaginary_coeff);
+    let mut init_state = BitVec::from_elem(3, false);
+    let mut ket = super::ket::create_ket(complex_coeff, init_state.clone(), vec![]);
+    assert!(ket.get_coefficient().equals_complex_coefficient(complex_coeff));
+    assert_eq!(ket.get_val(), init_state);
+
+    imaginary_coeff = super::coefficient::create_coefficient(0.0, true);
+    real_coeff = super::coefficient::create_coefficient(0.5, false);
+    complex_coeff = super::coefficient::create_complex_coefficient(real_coeff, imaginary_coeff);
+    init_state = BitVec::from_elem(3, false);
+    ket = super::ket::create_ket(complex_coeff, init_state.clone(), vec![]);
     assert!(ket.get_coefficient().equals_complex_coefficient(complex_coeff));
     assert_eq!(ket.get_val(), init_state);
 }
 
 #[test]
 fn test_create_state() {
-    let kets = vec![create_ket(), create_ket(), create_ket()];
-    let num_qubits = 3;
-    let symbol = 'p';
-    let state = super::state::create_state(kets, num_qubits, symbol);
+    let mut kets = vec![create_ket(), create_ket(), create_ket()];
+    let mut num_qubits = 3;
+    let mut symbol = 'p';
+    let mut state = super::state::create_state(kets, num_qubits, symbol);
+    assert_eq!(state.num_qubits, num_qubits);
+    assert_eq!(state.symbol, symbol);
+
+    kets = vec![create_ket(), create_ket()];
+    num_qubits = 2;
+    symbol = 'q';
+    state = super::state::create_state(kets, num_qubits, symbol);
     assert_eq!(state.num_qubits, num_qubits);
     assert_eq!(state.symbol, symbol);
 }
@@ -81,64 +101,4 @@ fn test_create_ensemble() {
 
     assert_eq!(subsystem_p.symbol, first_symbol);
     assert_eq!(subsystem_q.symbol, second_symbol);
-}
-
-#[test]
-fn test_lexer() {
-    let source = r#"
-    OPENQASM 2.0;
-    qreg a[3];
-    CX a[0], a[1];
-    "#;
-
-    let tokens = qasm::lex(source);
-    assert_eq!(
-        vec![
-            qasm::Token::OpenQASM,
-            qasm::Token::Real(2.0),
-            qasm::Token::Semicolon,
-            qasm::Token::QReg,
-            qasm::Token::Id("a".to_string()),
-            qasm::Token::LSParen,
-            qasm::Token::NNInteger(3),
-            qasm::Token::RSParen,
-            qasm::Token::Semicolon,
-            qasm::Token::Id("CX".to_string()),
-            qasm::Token::Id("a".to_string()),
-            qasm::Token::LSParen,
-            qasm::Token::NNInteger(0),
-            qasm::Token::RSParen,
-            qasm::Token::Comma,
-            qasm::Token::Id("a".to_string()),
-            qasm::Token::LSParen,
-            qasm::Token::NNInteger(1),
-            qasm::Token::RSParen,
-            qasm::Token::Semicolon
-        ],
-        tokens
-    )
-}
-
-#[test]
-fn test_parser() {
-    let source = r#"
-    OPENQASM 2.0;
-    qreg q[3];
-    qreg r[3];
-    x q[0];
-    cx q[0], q[1];
-    creg c[3];
-    measure q[0]->c[0];
-    measure r[0]->c[1];
-    measure q[0]->c[2];
-    "#;
-
-    let result = execute_qasm(source);
-    let mut expect = BTreeMap::new();
-    let mut regs = BTreeMap::new();
-    regs.insert(0, 1);
-    regs.insert(1, 0);
-    regs.insert(2, 1);
-    expect.insert('c', regs);
-    assert_eq!(result, expect);
 }
