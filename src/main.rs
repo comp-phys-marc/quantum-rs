@@ -1,7 +1,7 @@
 extern crate dotenv;
 extern crate qasm;
 
-use crate::parser;
+use rustsimulationservice::parser;
 
 use std::env;
 use std::collections::BTreeMap;
