@@ -2,8 +2,7 @@ mod coefficient;
 mod ket;
 mod state;
 mod ensemble;
-mod parser;
-mod client;
+pub mod parser;
 
 #[cfg(test)]
 mod tests;
