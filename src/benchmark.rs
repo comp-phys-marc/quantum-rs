@@ -45,27 +45,32 @@ fn ten_qubit_counterfeit_coin_finding() -> BitVec {
     let result = state.m(9);
     creg.set(9, result);
 
-    if result == false { state.x(9); }
-    if result == false { state.h(9); }
-    if result == true { state.h(0); }
-    if result == true { state.h(1); }
-    if result == true { state.h(2); }
-    if result == true { state.h(3); }
-    if result == true { state.h(4); }
-    if result == true { state.h(5); }
-    if result == true { state.h(6); }
-    if result == true { state.h(7); }
-    if result == true { state.h(8); }
-    if result == false { state.cx(6, 9); }
-    if result == false { state.h(0); }
-    if result == false { state.h(1); }
-    if result == false { state.h(2); }
-    if result == false { state.h(3); }
-    if result == false { state.h(4); }
-    if result == false { state.h(5); }
-    if result == false { state.h(6); }
-    if result == false { state.h(7); }
-    if result == false { state.h(8); }
+    if result == false { 
+        state.x(9);
+        state.h(9);
+        state.cx(6, 9);
+        state.h(0);
+        state.h(1);
+        state.h(2);
+        state.h(3);
+        state.h(4);
+        state.h(5);
+        state.h(6);
+        state.h(7);
+        state.h(8);
+    }
+
+    if result == true { 
+        state.h(0);
+        state.h(1);
+        state.h(2);
+        state.h(3);
+        state.h(4);
+        state.h(5);
+        state.h(6);
+        state.h(7);
+        state.h(8);
+    }
 
     state.normalize();
 
@@ -109,29 +114,34 @@ fn eleven_qubit_counterfeit_coin_finding() -> BitVec {
     let result = state.m(10);
     creg.set(10, result);
 
-    if result == false { state.x(10); }
-    if result == false { state.h(10); }
-    if result == true { state.h(0); }
-    if result == true { state.h(1); }
-    if result == true { state.h(2); }
-    if result == true { state.h(3); }
-    if result == true { state.h(4); }
-    if result == true { state.h(5); }
-    if result == true { state.h(6); }
-    if result == true { state.h(7); }
-    if result == true { state.h(8); }
-    if result == true { state.h(9); }
-    if result == false { state.cx(6, 10); }
-    if result == false { state.h(0); }
-    if result == false { state.h(1); }
-    if result == false { state.h(2); }
-    if result == false { state.h(3); }
-    if result == false { state.h(4); }
-    if result == false { state.h(5); }
-    if result == false { state.h(6); }
-    if result == false { state.h(7); }
-    if result == false { state.h(8); }
-    if result == false { state.h(9); }
+    if result == false { 
+        state.x(10);
+        state.h(10);
+        state.cx(6, 10);
+        state.h(0);
+        state.h(1);
+        state.h(2);
+        state.h(3);
+        state.h(4);
+        state.h(5);
+        state.h(6);
+        state.h(7);
+        state.h(8);
+        state.h(9);
+    }
+
+    if result == true { 
+        state.h(0);
+        state.h(1);
+        state.h(2);
+        state.h(3);
+        state.h(4);
+        state.h(5);
+        state.h(6);
+        state.h(7);
+        state.h(8);
+        state.h(9);
+    }
 
     state.normalize();
 
@@ -178,29 +188,34 @@ fn twelve_qubit_counterfeit_coin_finding() -> BitVec {
     let result = state.m(11);
     creg.set(11, result);
 
-    if result == false { state.x(10); }
-    if result == false { state.h(10); }
-    if result == true { state.h(0); }
-    if result == true { state.h(1); }
-    if result == true { state.h(2); }
-    if result == true { state.h(3); }
-    if result == true { state.h(4); }
-    if result == true { state.h(5); }
-    if result == true { state.h(6); }
-    if result == true { state.h(7); }
-    if result == true { state.h(8); }
-    if result == true { state.h(9); }
-    if result == false { state.cx(6, 10); }
-    if result == false { state.h(0); }
-    if result == false { state.h(1); }
-    if result == false { state.h(2); }
-    if result == false { state.h(3); }
-    if result == false { state.h(4); }
-    if result == false { state.h(5); }
-    if result == false { state.h(6); }
-    if result == false { state.h(7); }
-    if result == false { state.h(8); }
-    if result == false { state.h(9); }
+    if result == false { 
+        state.x(10);
+        state.h(10);
+        state.cx(6, 10);
+        state.h(0);
+        state.h(1);
+        state.h(2);
+        state.h(3);
+        state.h(4);
+        state.h(5);
+        state.h(6);
+        state.h(7);
+        state.h(8);
+        state.h(9);
+    }
+    
+    if result == true { 
+        state.h(0);
+        state.h(1);
+        state.h(2);
+        state.h(3);
+        state.h(4);
+        state.h(5);
+        state.h(6);
+        state.h(7);
+        state.h(8);
+        state.h(9);
+    }
 
     state.normalize();
 
