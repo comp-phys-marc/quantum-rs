@@ -7,21 +7,33 @@ use crate::ket::Ket;
 use crate::coefficient;
 use crate::coefficient::ComplexCoefficient;
 
+enum Backend {
+    'x86', // swaps out the coefficient impl
+    'WASM', // swaps out the coefficient impl
+    'RS', // leaves all impl usage as-is
+    'QMASM', // swaps out the coefficient impl and uses wasm_pfc
+    'QASM', // swaps out the ket impl
+    'delegated' // swaps out the ket impl and uses publisher
+}
+
 #[derive(Clone)]
 pub struct State {
     pub kets: Vec<Ket>,
     pub num_qubits: usize,
-    pub symbol: char
+    pub symbol: char,
+    pub backend: Backend,
+    pub lazy: bool,
+    pub verbose: bool
 }
 
 /// Initializes a quantum state with a given set of kets and number of qubits.
-pub fn create_state(kets:Vec<Ket>, num_qubits:usize, symbol:char) -> State {
-    State{kets: kets, num_qubits: num_qubits, symbol: symbol}
+pub fn create_state(kets:Vec<Ket>, num_qubits:usize, symbol:char, backend:Option<Backend>, lazy:Option<bool>, verbose:Option<bool>) -> State {
+    State{kets: kets, num_qubits: num_qubits, symbol: symbol, backend: backend.unwrap_or('RS'), lazy.unwrap_or(false), verbose.unwrap_or(false)}
 }
 
 impl State {
 
-    /// Adds a ket to the overall quantum state.        
+    /// Adds a ket to the overall quantum state.
     pub fn add_ket(&mut self, ket:Ket) {
         self.kets.push(ket);
     }
@@ -54,12 +66,16 @@ impl State {
     /// Performs a Pauli X gate on the target qubit.
     pub fn x(&mut self, qubit:usize) {
         for ket in &mut self.kets {
-            print!("x ({})", qubit);
-            ket.print();
-            print!(" =");
+            if self.verbose {
+                print!("x ({})", qubit);
+                ket.print();
+                print!(" =");
+            }
             ket.x(qubit);
-            ket.print();
-            println!();
+            if self.verbose {
+                ket.print();
+                println!();
+            }
         }
     }
          
@@ -67,36 +83,48 @@ impl State {
     /// source qubit as controller.
     pub fn cx(&mut self, source:usize, target:usize) {
         for ket in &mut self.kets {
-            print!("cx ({} -> {})",source, target);
-            ket.print();
-            print!(" =");
+            if self.verbose {
+                print!("cx ({} -> {})",source, target);
+                ket.print();
+                print!(" =");
+            }
             ket.cx(source, target);
-            ket.print();
-            println!();
+            if self.verbose {
+                ket.print();
+                println!();
+            }
         }
     }
 
     /// Performs a Pauli Y gate on the target qubit.       
     pub fn y(&mut self, qubit:usize) {
         for ket in &mut self.kets {
-            print!("y ({})", qubit);
-            ket.print();
-            print!(" =");
+            if self.verbose {
+                print!("y ({})", qubit);
+                ket.print();
+                print!(" =");
+            }
             ket.y(qubit);
-            ket.print();
-            println!();
+            if self.verbose {
+                ket.print();
+                println!();
+            }
         }
     }
 
     /// Performs a Pauli Z gate on the target qubit.            
     pub fn z(&mut self, qubit:usize) {
         for ket in &mut self.kets {
-            print!("z ({})", qubit);
-            ket.print();
-            print!(" =");
+            if self.verbose {
+                print!("z ({})", qubit);
+                ket.print();
+                print!(" =");
+            }
             ket.z(qubit);
-            ket.print();
-            println!();
+            if self.verbose {
+                ket.print();
+                println!();
+            }
         }
     }
 
@@ -126,45 +154,57 @@ impl State {
         negative_beta.negate_magnitude();
 
         if alpha.equals_complex_coefficient(beta) {
-            print!("h ({})", qubit);
-            for ket in &self.kets {
-                ket.print();
+            if self.verbose {
+                print!("h ({})", qubit);
+                for ket in &self.kets {
+                    ket.print();
+                }
+                print!(" =");
             }
-            print!(" =");
             self.kets = zero_kets;
-            for ket in &self.kets {
-                ket.print();
+            if self.verbose {
+                for ket in &self.kets {
+                    ket.print();
+                }
+                println!();
             }
-            println!();
         }
 
         else if alpha.equals_complex_coefficient(negative_beta) {
-            print!("h ({})", qubit);
-            for ket in &self.kets {
-                ket.print();
+            if self.verbose {
+                print!("h ({})", qubit);
+                for ket in &self.kets {
+                    ket.print();
+                }
+                print!(" =");
             }
-            print!(" =");
             self.kets = one_kets;
-            for ket in &self.kets {
-                ket.print();
+            if self.verbose {
+                for ket in &self.kets {
+                    ket.print();
+                }
+                println!();
             }
-            println!();
         }
 
         else {
             let mut new_kets:Vec<Ket> = vec![];
             for ket in &mut self.kets {
-                print!("h ({})", qubit);
-                ket.print();
+                if self.verbose {
+                    print!("h ({})", qubit);
+                    ket.print();
+                }
                 let hadamard_result = ket.h(qubit);
                 for result in &hadamard_result {
                     new_kets.push(result.clone());
                 }
-                print!(" =");
-                for result in &hadamard_result {
-                    result.print();
+                if self.verbose {
+                    print!(" =");
+                    for result in &hadamard_result {
+                        result.print();
+                    }
+                    println!();
                 }
-                println!();
             }
             self.kets = new_kets;
         }
@@ -229,7 +269,9 @@ impl State {
             }
         }
         self.kets = unique_kets;
-        println!("normalizing factor: {}", norm_factor);
+        if self.verbose {
+            println!("normalizing factor: {}", norm_factor);
+        }
     }
 
 
