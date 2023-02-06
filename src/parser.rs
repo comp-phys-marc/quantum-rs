@@ -31,7 +31,7 @@ pub fn init_state(num_qubits:usize, symbol:char) -> State {
         i += 1;
     }
 
-    let state = state::create_state(kets, num_qubits, symbol);
+    let state = state::create_state(kets, num_qubits, symbol, None, None, None);
     state
 }
 

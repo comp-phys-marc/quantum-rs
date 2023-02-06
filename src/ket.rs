@@ -5,6 +5,8 @@
 extern crate bit_vec;
 use bit_vec::BitVec;
 use crate::coefficient::ComplexCoefficient;
+use crate::coefficient::Coefficient;
+use crate::coefficient::FloatCoefficient;
 
 #[derive(Clone)]
 pub struct Ket {

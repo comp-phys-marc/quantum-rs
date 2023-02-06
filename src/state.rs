@@ -6,14 +6,17 @@ use rand::Rng;
 use crate::ket::Ket;
 use crate::coefficient;
 use crate::coefficient::ComplexCoefficient;
+use crate::coefficient::Coefficient;
+use crate::coefficient::FloatCoefficient;
 
-enum Backend {
-    'x86', // swaps out the coefficient impl
-    'WASM', // swaps out the coefficient impl
-    'RS', // leaves all impl usage as-is
-    'QMASM', // swaps out the coefficient impl and uses wasm_pfc
-    'QASM', // swaps out the ket impl
-    'delegated' // swaps out the ket impl and uses publisher
+#[derive(Clone)]
+pub enum Backend {
+    X86, // swaps out the coefficient impl
+    WASM, // swaps out the coefficient impl
+    RS, // leaves all impl usage as-is
+    QMASM, // swaps out the coefficient impl and uses wasm_pfc
+    QASM, // swaps out the ket impl
+    DELEGATED  // swaps out the ket impl and uses publisher
 }
 
 #[derive(Clone)]
@@ -28,7 +31,7 @@ pub struct State {
 
 /// Initializes a quantum state with a given set of kets and number of qubits.
 pub fn create_state(kets:Vec<Ket>, num_qubits:usize, symbol:char, backend:Option<Backend>, lazy:Option<bool>, verbose:Option<bool>) -> State {
-    State{kets: kets, num_qubits: num_qubits, symbol: symbol, backend: backend.unwrap_or('RS'), lazy.unwrap_or(false), verbose.unwrap_or(false)}
+    State{kets: kets, num_qubits: num_qubits, symbol: symbol, backend: backend.unwrap_or(Backend::RS), lazy: lazy.unwrap_or(false), verbose: verbose.unwrap_or(false)}
 }
 
 impl State {
