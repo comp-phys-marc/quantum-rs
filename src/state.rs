@@ -16,7 +16,8 @@ pub enum Backend {
     RS, // leaves all impl usage as-is
     QMASM, // swaps out the coefficient impl and uses wasm_pfc
     QASM, // swaps out the ket impl
-    DELEGATED  // swaps out the ket impl and uses publisher
+    DELEGATED,  // swaps out the ket impl and uses publisher
+    HARDWARE // swaps out the state implementation for a hardware manager per https://arxiv.org/abs/2302.00821
 }
 
 #[derive(Clone)]

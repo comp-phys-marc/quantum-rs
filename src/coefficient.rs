@@ -6,7 +6,7 @@ pub struct FloatCoefficient {
     imaginary: bool
 }
 
-/// Initializes a coefficient.
+/// Initializes a float coefficient.
 pub fn create_coefficient(magnitude:f64, imaginary:bool) -> FloatCoefficient {
     FloatCoefficient{magnitude: magnitude, imaginary: imaginary}
 }
